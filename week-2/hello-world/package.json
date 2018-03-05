@@ -1,0 +1,8 @@
+{
+    "name": "hello-world",
+    "author": "Johnny Vanderhorst",
+    "private": true,
+    "dependencies": {
+        "express": "^4.16.2"
+    }
+}
