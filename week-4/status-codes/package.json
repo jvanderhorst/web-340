@@ -1,0 +1,8 @@
+{
+    "name": "status-codes",
+    "author": "Johnny Vanderhorst",
+    "private": true,
+    "dependencies": {
+        "express": "^4.16.3"
+    }
+}
