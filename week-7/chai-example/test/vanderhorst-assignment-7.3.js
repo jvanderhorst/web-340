@@ -8,7 +8,7 @@
 ;===========================================
 */ 
 
-var fruits = require("../fruits");
+var fruits = require("../vanderhorst-fruits");
 var chai = require("chai");
 var assert = chai.assert;
 
