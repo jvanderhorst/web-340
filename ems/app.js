@@ -15,7 +15,10 @@ var path = require("path");
 var logger = require("morgan");
 var mongoose = require("mongoose");
 var Employee = require("./models/employee");
+var helmet = require("helmet");
 
+// initialize express
+var app = express();
 
 // mLab connection
 var mongoDB = "mongodb://jvanderhorst:vader@ds159662.mlab.com:59662/ems";
@@ -30,17 +33,25 @@ db.once("open", function() {
     console.log("Application connected to mLab MongoDB instance");
 });
 
-var app = express();
-
 // app functions
 app.set("views", path.resolve(__dirname, "views"));//tell express the views are in the 'views' directory
 app.set("view engine", "ejs");//tell express to use the ejs view engine
+
+// use statements
 app.use(logger("short"));
+app.use(helmet.xssFilter());
 
 // app route
 app.get("/", function (request, response) {
     response.render("index", {
         title: "Home page"
+    });
+});
+
+// http calls
+app.get("/", function(request, response){
+    response.render("index", {
+        message: "XSS Prevention Example"
     });
 });
 
