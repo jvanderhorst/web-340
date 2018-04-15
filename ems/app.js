@@ -16,6 +16,12 @@ var logger = require("morgan");
 var mongoose = require("mongoose");
 var Employee = require("./models/employee");
 var helmet = require("helmet");
+var bodyParser = require("body-parser");
+var cookieParser = require("cookie-parser");
+var csrf = require("csurf");
+
+//csrf protection
+var csrfProtection = csrf({cookie: true});
 
 // initialize express
 var app = express();
@@ -40,12 +46,32 @@ app.set("view engine", "ejs");//tell express to use the ejs view engine
 // use statements
 app.use(logger("short"));
 app.use(helmet.xssFilter());
+app.use(bodyParser.urlencoded({
+    extended: true
+}));
+app.use(cookieParser());
+app.use(csrfProtection);
+app.use(function(request, response, next) {
+    var token = request.csrfToken();
+    response.cookie('XSRF-TOKEN', token);
+    response.locals.csrfToken = token;
+    next();
+});
 
 // app route
 app.get("/", function (request, response) {
     response.render("index", {
         title: "Home page"
     });
+});
+app.get("/", function(request, response) {
+    response.render("index", {
+        message: "New Employee Entry Page"
+    });
+});
+app.post("/process", function(request, response) {
+    console.log(request.body.txtName);
+    response.redirect("/");
 });
 
 // http calls
