@@ -42,6 +42,7 @@ db.once("open", function() {
 // app functions
 app.set("views", path.resolve(__dirname, "views"));//tell express the views are in the 'views' directory
 app.set("view engine", "ejs");//tell express to use the ejs view engine
+app.set("port", process.env.PORT || 8080);
 
 // use statements
 app.use(logger("short"));
@@ -64,14 +65,45 @@ app.get("/", function (request, response) {
         title: "Home page"
     });
 });
-app.get("/", function(request, response) {
-    response.render("index", {
-        message: "New Employee Entry Page"
+app.get("/new", function(request, response) {
+    response.render("new.ejs", {
+        title: "New Employee"
     });
 });
 app.post("/process", function(request, response) {
-    console.log(request.body.txtName);
-    response.redirect("/");
+    // console.log(request.body.txtName);
+    if (!request.body.txtName) {
+        response.status(400).send("Entries must have a name");
+        return;
+    }
+ 
+    // get the request's form data
+    var employeeName = request.body.txtName;
+    console.log(employeeName);
+ 
+    // create a employee model
+    var employee = new Employee({
+        name: employeeName
+    });
+ 
+    // save
+    employee.save(function (error) {
+        if (error) throw error;
+ 
+        console.log(employeeName + " saved successfully!");
+    });
+ 
+    response.redirect("list.ejs");
+ });
+ app.get("/list", function(request, response) {
+    Employee.find({}, function(error, employees) {
+       if (error) throw error;
+
+       response.render("list.ejs", {
+           title: "Employee List",
+           employees: employees
+       });
+    });
 });
 
 // http calls
