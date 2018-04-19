@@ -39,11 +39,6 @@ db.once("open", function() {
     console.log("Application connected to mLab MongoDB instance");
 });
 
-// app functions
-app.set("views", path.resolve(__dirname, "views"));//tell express the views are in the 'views' directory
-app.set("view engine", "ejs");//tell express to use the ejs view engine
-app.set("port", process.env.PORT || 8080);
-
 // use statements
 app.use(logger("short"));
 app.use(helmet.xssFilter());
@@ -59,6 +54,11 @@ app.use(function(request, response, next) {
     next();
 });
 
+// app functions
+app.set("views", path.resolve(__dirname, "views"));//tell express the views are in the 'views' directory
+app.set("view engine", "ejs");//tell express to use the ejs view engine
+app.set("port", process.env.PORT || 8080);
+
 // app route
 app.get("/", function (request, response) {
     response.render("index", {
@@ -66,7 +66,7 @@ app.get("/", function (request, response) {
     });
 });
 app.get("/new", function(request, response) {
-    response.render("new.ejs", {
+    response.render("new", {
         title: "New Employee"
     });
 });
@@ -93,27 +93,47 @@ app.post("/process", function(request, response) {
         console.log(employeeName + " saved successfully!");
     });
  
-    response.redirect("list.ejs");
+    response.redirect("/list");
  });
  app.get("/list", function(request, response) {
     Employee.find({}, function(error, employees) {
        if (error) throw error;
 
-       response.render("list.ejs", {
+       response.render("list", {
            title: "Employee List",
            employees: employees
        });
     });
 });
 
-// http calls
+/* http calls
 app.get("/", function(request, response){
     response.render("index", {
         message: "XSS Prevention Example"
+    });
+});*/
+
+app.get("/view/:queryName", function (request, response) {
+    var queryName = request.params.queryName;
+
+    Employee.find({'name': queryName}, function(error, employees) {
+        if (error) throw error;
+
+        console.log(employees);
+
+        if (employees.length > 0) {
+            response.render("view", {
+                title: "Employee Record",
+                employee: employees
+            })
+        }
+        else {
+            response.redirect("/list")
+        }
     });
 });
 
 // create server
 http.createServer(app).listen(8080, function() {
-    console.log("Application started on port 8080!");
+    console.log("Application started on port 8080!" + app.get("port"));
 });
