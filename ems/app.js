@@ -134,6 +134,6 @@ app.get("/view/:queryName", function (request, response) {
 });
 
 // create server
-http.createServer(app).listen(8080, function() {
-    console.log("Application started on port 8080!" + app.get("port"));
+http.createServer(app).listen(app.get("port"), function() {
+    console.log("Application started on port " + app.get("port"));
 });
